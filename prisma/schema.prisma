@@ -1,0 +1,39 @@
+generator client {
+  provider     = "prisma-client-js"
+  jsonProtocol = true
+}
+
+datasource db {
+  provider  = "mysql"
+  url       = env("DATABASE_URL")
+}
+
+model Annonce {
+  id        String  @id @default(cuid())
+  title     String
+  content   String?
+  published Boolean @default(false)
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  String?
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String?
+  email     String?   @unique
+  createdAt DateTime  @default(now()) @map(name: "created_at")
+  updatedAt DateTime  @updatedAt @map(name: "updated_at")
+  Annonces  Annonce[]
+  Role      Role?     @relation(fields: [roleId], references: [id])
+  roleId    String?
+
+  @@map(name: "users")
+}
+
+model Role {
+  id    String  @id @default(cuid())
+  name  String?
+  users User[]
+
+  @@map(name: "roles")
+}
